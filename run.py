@@ -135,22 +135,29 @@ async def run(usernames):
 
 
 def scrape_from_file(file_path, column_name):
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Input file not found: {file_path}")
+
     if file_path.endswith(".csv"):
         df = pd.read_csv(file_path)
     elif file_path.endswith(".xlsx"):
         df = pd.read_excel(file_path)
     else:
-        raise ValueError("Unsupported file format.")
+        raise ValueError("Unsupported file format. Please use .csv or .xlsx")
 
     if column_name not in df.columns:
-        raise ValueError(f"Column '{column_name}' not found in the file.")
+        raise ValueError(f"Column '{column_name}' not found in file.")
 
-    df = df.dropna(subset=[column_name])
-    df[column_name] = df[column_name].astype(str).str.replace("@", "").str.strip()
-    usernames = df[column_name][df[column_name] != ""].tolist()
+    usernames = df[column_name].dropna().astype(str).str.replace("@", "").str.strip().tolist()
+    usernames = [u for u in usernames if u]
 
-    print(f"\nLoaded {len(usernames)} usernames from file.")
+    total = len(usernames)
+    print(f"\nLoaded {total} usernames from file.")
+    print(f"▶️  Starting run for {total} users.")
+
     asyncio.run(run(usernames))
+
+
 
 
 if __name__ == "__main__":

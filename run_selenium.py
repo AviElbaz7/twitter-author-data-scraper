@@ -55,7 +55,12 @@ async def run(usernames):
         end_idx = min(start_idx + BATCH_SIZE, total_users)
         batch = usernames[start_idx:end_idx]
 
-        print(f"\n▶️  Processing batch {batch_index + 1}/{total_batches} ({len(batch)} users)... ({end_idx}/{total_users})")
+        # ✅ show progress
+        remaining = total_users - start_idx
+        print(f"\n▶️  Processing batch {batch_index + 1}/{total_batches} "
+              f"({len(batch)} users)... ({end_idx}/{total_users})")
+        print(f"▶️  Remaining users: {remaining}")
+
         batch_results = []
 
         for username in batch:
@@ -81,6 +86,7 @@ async def run(usernames):
     print(f"\n✅ All {total_users} profiles scraped and saved to {output_csv}")
 
 
+
 # -----------------------------------
 # File reader
 # -----------------------------------
@@ -103,8 +109,10 @@ def scrape_from_file(file_path, column_name):
 
     total = len(usernames)
     print(f"\nLoaded {total} usernames from file.")
-    print(f"▶️  Total users left: {total}")
+    print(f"▶️  Starting run for {total} users.")
+
     asyncio.run(run(usernames))
+
 
 
 # -----------------------------------
